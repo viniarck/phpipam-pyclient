@@ -44,6 +44,14 @@ source .venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
+### via Docker
+
+```
+docker pull registry.gitlab.com/viniciusarcanjo/phpipam-python-client:dev
+```
+
 ## Docs
 
-Next you have to configure the parameters to authenticate your user on phpipam in the ``phpipam_pyclient/config.json`` file. You can find more information, examples and usage on ReadTheDocs.
+[![Documentation Status](https://readthedocs.org/projects/phpipam-pyclient/badge/?version=latest)](http://phpipam-pyclient.readthedocs.io/en/latest/?badge=latest)
+
+After completing the installation, you have to configure the parameters to authenticate your user on phpipam in the ``phpipam_pyclient/config.json`` file. You can find more information, examples and usage on [ReadTheDocs](http://phpipam-pyclient.readthedocs.io/).
