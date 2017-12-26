@@ -1,4 +1,4 @@
-image: registry.gitlab.com/viniciusarcanjo/phpipam-pyclient/docker:dev
+image: viniciusarcanjo/phpipam-pyclient-docker:dev
 
 services:
 - docker:dind

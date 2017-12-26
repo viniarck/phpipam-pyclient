@@ -47,7 +47,19 @@ pip3 install -r requirements.txt
 ### via Docker
 
 ```
-docker pull registry.gitlab.com/viniciusarcanjo/phpipam-python-client:dev
+docker run -i -t -d --name phpipam-pyclient viniciusarcanjo/phpipam-pyclient:dev
+```
+
+Edit your config.json file, either mount or copy to the container:
+
+```
+docker cp <config.json> phpipam-pyclient:/app/phpipam_pyclient/
+```
+
+Run the application:
+
+```
+docker exec -i -t phpipam-pyclient /bin/bash -c 'cd phpipam_pyclient; python3 phpipam_pyclient.py'
 ```
 
 ## Docs

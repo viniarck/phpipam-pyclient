@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install python3 python3-pip -y
 
 COPY requirements.txt $APPDIR/
 COPY requirements_dev.txt $APPDIR/
-COPY config.json $APPDIR/
+COPY phpipam_pyclient/config.json $APPDIR/
 
 RUN pip3 install --no-cache-dir -r requirements.txt -U
 RUN pip3 install --no-cache-dir -r requirements_dev.txt -U
