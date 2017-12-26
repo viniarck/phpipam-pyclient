@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sphinx_rtd_theme
 #
 # phpipam-pyclient documentation build configuration file, created by
 # sphinx-quickstart on Tue Dec 26 13:23:47 2017.
@@ -83,8 +84,6 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 # html_theme = 'alabaster'
-import sphinx_rtd_theme
-
 html_theme = "sphinx_rtd_theme"
 
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
@@ -156,6 +155,3 @@ texinfo_documents = [
      author, 'phpipam-pyclient', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
