@@ -26,10 +26,15 @@ lint_tests:
     - docker exec phpipampyclient_phpipam_pyclient_1 /bin/bash -c 'python3 -m pytest tests/test_phpipam_client.py -v'
     - docker exec phpipampyclient_phpipam_pyclient_1 /bin/bash -c 'tox'
 
-test_phpipam_1.3.1:
+test_phpipam_latest:
     <<: *integration_def
     script:
     - docker-compose -p phpipampyclient up -d
+
+test_phpipam_1.3.1:
+    <<: *integration_def
+    script:
+    - docker-compose -p phpipampyclient -f docker-compose-1.3.1.yml up -d
 
 test_phpipam_1.3:
     <<: *integration_def
