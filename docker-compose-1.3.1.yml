@@ -13,6 +13,9 @@ services:
     image: pierrecdn/phpipam:1.3.1
     environment:
       - MYSQL_ENV_MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_ENV_MYSQL_PASSWORD=my-secret-pw
+      - MYSQL_ENV_MYSQL_HOST=mysql
+      - MYSQL_ENV_MYSQL_USER=root
     ports:
       - "80:80"
   selenium:
