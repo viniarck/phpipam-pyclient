@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'phpipam-pyclient'
-copyright = u'2017, Vinicius Arcanjo'
+copyright = u'2018, Vinicius Arcanjo'
 author = u'Vinicius Arcanjo'
 
 # The version info for the project you're documenting, acts as replacement for

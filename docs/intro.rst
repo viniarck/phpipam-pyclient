@@ -13,5 +13,6 @@ Integration tests are implemented with pytest validating both Python2.7 and Pyth
 
 The following versions of PHPIpam are being tested on GitLab CI:
 
+- 1.3.2
 - 1.3.1
 - 1.3
