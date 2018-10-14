@@ -4,7 +4,7 @@ phpipam-pyclient is a REST-client CLI tool to interface with [phpipam](https://g
 
 ### Testing
 
-[![pipeline status](https://gitlab.com/viniciusarcanjo/phpipam-pyclient/badges/master/pipeline.svg)](https://gitlab.com/viniciusarcanjo/phpipam-pyclient/commits/master)
+[![pipeline status](https://gitlab.com/viniarck/phpipam-pyclient/badges/master/pipeline.svg)](https://gitlab.com/viniarck/phpipam-pyclient/commits/master)
 
 Integration tests are implemented with pytest validating both Python2.7 and Python3.5 on a docker-based environment, in two stages:
 
@@ -25,7 +25,7 @@ You have two options, either via the source code on Github or Docker:
 1 - Git clone
 
 ```
-git clone https://github.com/viniciusarcanjo/phpipam-python-client.git; cd phpipam-pyclient
+git clone https://github.com/viniarck/phpipam-python-client.git; cd phpipam-pyclient
 ```
 
 2 - Install Python requirements dependencies, either via user install or virtualenv:
