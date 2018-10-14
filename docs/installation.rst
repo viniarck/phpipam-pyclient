@@ -10,7 +10,7 @@ via Github
 
 ::
 
-  git clone https://github.com/viniciusarcanjo/phpipam-python-client.git; cd phpipam-pyclient
+  git clone https://github.com/viniarck/phpipam-python-client.git; cd phpipam-pyclient
 
 2 - Install Python requirements dependencies, either via user install or virtualenv:
 
@@ -33,7 +33,7 @@ via Docker
 
 ::
 
-  docker run -i -t -d --name phpipam-pyclient viniciusarcanjo/phpipam-pyclient:dev
+  docker run -i -t -d --name phpipam-pyclient viniarck/phpipam-pyclient:dev
 
 Edit your config.json file, either mount or copy to the container:
 

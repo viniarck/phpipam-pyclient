@@ -6,7 +6,7 @@ phpipam-pyclient is a REST-client CLI tool to interface with [phpipam](https://g
 
 [![pipeline status](https://gitlab.com/viniarck/phpipam-pyclient/badges/master/pipeline.svg)](https://gitlab.com/viniarck/phpipam-pyclient/commits/master)
 
-Integration tests are implemented with pytest validating both Python2.7 and Python3.5 on a docker-based environment, in two stages:
+Integration tests are implemented with pytest validating both Python3.6 and Python2.7 on a docker-based environment, in two stages:
 
 - installation: validates a phpipam installation from strach with selenium.
 - client-server API: validates this phpipam-pyclient with phpipam REST API.
@@ -39,21 +39,21 @@ pip3 install -r requirements.txt --user
 2\.1 - or virtualenv:
 
 ```
-virtualenv -p python3.5 .venv
+virtualenv -p python3.6 .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-### via Docker
+### With Docker container
 
 ```
-docker run -i -t -d --name phpipam-pyclient viniciusarcanjo/phpipam-pyclient:dev
+docker run -i -t -d --name phpipam-pyclient viniarck/phpipam-pyclient:dev
 ```
 
 Edit your config.json file, either mount or copy to the container:
 
 ```
-docker cp <config.json> phpipam-pyclient:/app/phpipam_pyclient/
+docker cp ./phpipam_pyclient/config.json phpipam-pyclient:/app/phpipam_pyclient/
 ```
 
 Run the application:
