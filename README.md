@@ -13,6 +13,7 @@ Integration tests are implemented with pytest validating both Python3.6 and Pyth
 
 The following versions of phpipam are being tested on GitLab CI:
 
+- 1.3.2 (latest as of now)
 - 1.3.1
 - 1.3
 
@@ -47,7 +48,7 @@ pip3 install -r requirements.txt
 ### With Docker container
 
 ```
-docker run -i -t -d --name phpipam-pyclient viniarck/phpipam-pyclient:dev
+docker run -i -t -d --name phpipam-pyclient registry.gitlab.com/viniarck/phpipam-pyclient:dev
 ```
 
 Edit your config.json file, either mount or copy to the container:

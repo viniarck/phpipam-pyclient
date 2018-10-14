@@ -27,7 +27,7 @@ services:
     - /dev/shm:/dev/shm
   phpipam_pyclient:
     command: /bin/bash
-    image: viniarck/phpipam-pyclient:dev
+    image: registry.gitlab.com/viniarck/phpipam-pyclient:dev
     stdin_open: true
     tty: true
     # build:
