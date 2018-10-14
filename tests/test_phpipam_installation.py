@@ -154,12 +154,26 @@ class TestPhpIpamInstallation(object):
             drv.get(get_args['settings_url'])
         # scroll down to click API button
         drv.execute_script("window.scrollTo(0, 800);")
-        drv.find_element_by_xpath(
-            '//*[@id="settings"]/tbody/tr[16]/td[2]/div/div/span[2]').click()
+        try:
+            drv.find_element_by_xpath(
+                '//*[@id="settings"]/tbody/tr[16]/td[2]/div/div/span[2]'
+                ).click()
+        except NoSuchElementException:
+            # new version has changed the layout slightly
+            drv.find_element_by_xpath(
+                '//*[@id="settings"]/tbody/tr[17]/td[2]/div/div/span[3]'
+                ).click()
+
         # scroll to the bottom to save
         drv.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        drv.find_element_by_xpath(
-            '//*[@id="settings"]/tbody/tr[51]/td[2]/input').click()
+
+        try:
+            drv.find_element_by_xpath(
+                '//*[@id="settings"]/tbody/tr[51]/td[2]/input').click()
+        except NoSuchElementException:
+            # new version has changed the layout slightly
+            drv.find_element_by_xpath(
+                '//*[@id="settings"]/tbody/tr[52]/td[2]/input').click()
 
         # force it to refresh.
         for _ in range(0, 2):
@@ -171,4 +185,9 @@ class TestPhpIpamInstallation(object):
         sel.select_by_visible_text('Read / Write / Admin')
         sel = Select(drv.find_element_by_name('app_security'))
         sel.select_by_visible_text('none')
-        drv.find_element_by_xpath('//*[@id="apiEditSubmit"]').click()
+        try:
+            drv.find_element_by_xpath('//*[@id="apiEditSubmit"]').click()
+        except NoSuchElementException:
+            # new version has changed the layout slightly
+            drv.find_element_by_xpath(
+                '//*[@id="popup"]/div[3]/div[1]/button[2]').click()
