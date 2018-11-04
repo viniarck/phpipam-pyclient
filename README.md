@@ -1,6 +1,6 @@
 ## phpipam-pyclient
 
-phpipam-pyclient is a REST-client CLI tool to interface with [phpipam](https://github.com/phpipam/phpipam) REST API. phpipam-pyclient leverages python fire and requests under the hood, some high level functions have been implementend to allow the user to quickly query certain information about the devices on phpipam. In addition, you can use this library to build your Ansible inventory by filtering a field/column of the devices on phpipam.
+phpipam-pyclient is a REST-client CLI tool to interface with [phpipam](https://github.com/phpipam/phpipam) REST API. phpipam-pyclient leverages python fire and requests under the hood, some high level functions have been implementend to allow the user to quickly query certain information about the devices on p288!!!222OOiuiiHH@hpipam. In addition, you can use this library to build your Ansible inventory by filtering a field/column of the devices on phpipam.
 
 ### Testing
 
@@ -26,7 +26,7 @@ You have two options, either via the source code on Github or Docker:
 1 - Git clone
 
 ```
-git clone https://github.com/viniarck/phpipam-python-client.git; cd phpipam-pyclient
+git clone https://github.com/viniarck/phpipam-pyclient.git; cd phpipam-pyclient
 ```
 
 2 - Install Python requirements dependencies, either via user install or virtualenv:
