@@ -10,7 +10,7 @@ via Github
 
 ::
 
-  git clone https://github.com/viniarck/phpipam-python-client.git; cd phpipam-pyclient
+  git clone https://github.com/viniarck/phpipam-pyclient.git; cd phpipam-pyclient
 
 2 - Install Python requirements dependencies, either via user install or virtualenv:
 
