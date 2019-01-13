@@ -9,6 +9,8 @@ import json
 import warnings
 import requests
 import os
+import sys
+from phpipam_pyclient.version import __version__
 DISABLE_SSL_WARNINGS = True
 if DISABLE_SSL_WARNINGS:
     warnings.filterwarnings("ignore")
@@ -17,28 +19,48 @@ if DISABLE_SSL_WARNINGS:
 class PHPIpamClient(object):
     """PHPIPam Python API Client"""
 
-    def __init__(self, cfg_file='config.json'):
+    def __init__(self, cfg_file='config.json', open_con=True, load_conf=True):
         """PPHIpam Python client
+        This class is meant to be used with Google's fire in order to also
+        be used in a CLI exploring style.
 
         :cfg_file: json configuration file
+        :open_con: True to open TCP connection
+        :open_con: True to auto load config
 
         """
-        self._load_config(cfg_file=cfg_file)
-        self._token = None
-        self._session = None
-        self._auth_session()
-        self._verify = False
+        try:
+            self.load_config(cfg_file=cfg_file)
+            self._token = None
+            self._session = None
+            self._verify = False
+            if open_con:
+                self.auth_session()
+        except FileNotFoundError as e:
+            print(str(e))
+        except json.JSONDecodeError as e:
+            print(str(e))
+            sys.exit(1)
+        except requests.exceptions.RequestException as e:
+            print(str(e))
+            print("\nHave you configured your config.json file yet? ")
+            sys.exit(1)
 
-    def _load_config(self, cfg_file='config.json'):
-        """Loads configuration file specified in config.json
+    def load_config(self, cfg_file='config.json'):
+        """Load configuration file specified in config.json
+
+        If the PHPIPAM_PYCLIENT_CFG_FILE environment variable
+        exists, it takes higher precedence.
 
         :cfg_file: configuration file
 
         """
-        with open(
-                os.path.join(
-                    os.path.abspath(os.path.dirname(__file__)),
-                    cfg_file)) as json_file:
+        file_path = os.environ.get("PHPIPAM_PYCLIENT_CFG_FILE")
+        if not file_path:
+            file_path = os.path.join(os.path.abspath(
+                                     os.path.dirname(__file__)),
+                                     cfg_file)
+        with open(file_path) as json_file:
             data = json.load(json_file)
             self._base_url = data['base_url']
             self._api_name = data['api_name']
@@ -48,12 +70,12 @@ class PHPIpamClient(object):
             self._user = data['user']
             self._passwd = data['passwd']
 
-    def _auth_session(self):
-        """Authenticates on PHPIpam API
+    def auth_session(self):
+        """Authenticate on PHPIpam API
 
         """
-        req = requests.post(
-            self._auth_url, auth=(self._user, self._passwd), verify=False)
+        req = requests.post(self._auth_url, auth=(self._user, self._passwd),
+                            verify=self._verify)
         if req.status_code != 200:
             raise requests.exceptions.RequestException(
                 "Authentication failed on {0}".format(self._auth_url))
@@ -76,7 +98,7 @@ class PHPIpamClient(object):
             url, headers=self._token, verify=self._verify, data=data)
 
     def list_device_fields(self):
-        """Lists all devices' available fields/columns
+        """List all devices' available fields/columns
 
         """
         req = self._call(endpoint='devices/')
@@ -87,7 +109,9 @@ class PHPIpamClient(object):
         return []
 
     def ansible_inv_endpoint_field(self, endpoint, field):
-        """Groups devices based on a unique field value and outputs Ansible inventory
+        """Group devices based on a unique field value and outputs
+        Ansible inventory
+
         :endpoint: endpoint to be filtered, e.g., devices/
         :field: field to be filtered as a group, e.g., "description",
         "server_os" (custom), etc..
@@ -116,14 +140,14 @@ class PHPIpamClient(object):
         return None
 
     def _delete_device(self, id):
-        """Deletes a device given a database id
+        """Delete a device given a database id
 
         """
         url = "{0}/{1}".format(self._api_url, 'devices/{0}/'.format(id))
         return requests.delete(url, headers=self._token, verify=self._verify)
 
     def add_device(self, device=None):
-        """Adds device to PHPIpam given a dictionary that represents a device
+        """Add device to PHPIpam given a dictionary that represents a device
         i.e., it should have these keys at least
         'ip', 'hostname', 'description'
 
@@ -137,7 +161,7 @@ class PHPIpamClient(object):
         return self._post(endpoint='devices/1/', data=device).status_code
 
     def list_devices(self, fields=None):
-        """Lists all devices and filter for specific fields
+        """List all devices and filter for specific fields
 
         :fields: optional field attributes to be filtered
 
@@ -164,6 +188,14 @@ class PHPIpamClient(object):
                         device_list.append(device)
             return device_list
 
+    def version(self):
+        """Get phpipam-pyclient version."""
+        return __version__
+
+
+def main():
+    fire.Fire(PHPIpamClient)
+
 
 if __name__ == "__main__":
-    fire.Fire(PHPIpamClient)
+    main()
