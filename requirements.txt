@@ -1,2 +1,8 @@
-requests
-fire
+selenium
+pylama
+pytest
+pytest-cov
+tox
+sphinx
+sphinx-autobuild
+sphinx_rtd_theme
