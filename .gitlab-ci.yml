@@ -1,4 +1,4 @@
-image: registry.gitlab.com/viniarck/phpipam-pyclient:dev
+image: docker:latest
 
 services:
 - docker:dind
@@ -11,6 +11,7 @@ stages:
     - integration_tests
 
 lint_tests:
+    image: registry.gitlab.com/viniarck/phpipam-pyclient:dev
     stage: lint_tests
     script:
         # find all py files excluding hidden files
@@ -18,6 +19,9 @@ lint_tests:
 
 .integration_tests: &integration_def
   stage: integration_tests
+  before_script:
+    - apk add --no-cache py-pip
+    - pip install docker-compose
   after_script:
     - docker ps
     - sleep 10

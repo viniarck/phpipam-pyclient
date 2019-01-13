@@ -57,7 +57,6 @@ class TestPhpIpamInstallation(object):
 
         return args
 
-    @pytest.fixture
     def find_element_dict_send_keys(self, function, payload):
         """Generic function to find an element given a function and
         payload dict
