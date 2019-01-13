@@ -18,6 +18,8 @@ In order to connect to PHPIpam REST API you have to edit the ``phpipam_pyclient/
 - ``user``: username that will be authenticated on PHPIpam
 - ``passwd``: user's password
 
+Optionally, if you don't want to specify another location for the `config.json` file, you can set the environment variable `PHPIPAM_PYCLIENT_CFG_FILE` which has higher precedence.
+
 .. note::
 
   When you enable API either choose ssl if you have https enabled or leave it as None for http. I haven't tested the crypto option.

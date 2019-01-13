@@ -9,16 +9,19 @@ phpipam-client leverages python fire to implement the CLI, you can start by chec
 
 .. code:: shell
 
-  root@2186b110a223:/app/phpipam_pyclient# python3 phpipam_pyclient.py
+  root@c0630eda943f:/app# phpipam-pyclient
   Type:        PHPIpamClient
-  String form: <__main__.PHPIpamClient object at 0x7fb28bbf1898>
+  String form: <phpipam_pyclient.phpipam_pyclient.PHPIpamClient object at 0x7f8b49a44550>
   Docstring:   PHPIPam Python API Client
 
-  Usage:       phpipam_pyclient.py -
-               phpipam_pyclient.py - add-device
-               phpipam_pyclient.py - ansible-inv-endpoint-field
-               phpipam_pyclient.py - list-device-fields
-               phpipam_pyclient.py - list-devices
+  Usage:       phpipam-pyclient -
+               phpipam-pyclient - add-device
+               phpipam-pyclient - ansible-inv-endpoint-field
+               phpipam-pyclient - auth-session
+               phpipam-pyclient - list-device-fields
+               phpipam-pyclient - list-devices
+               phpipam-pyclient - load-config
+               phpipam-pyclient - version
 
 Since I don't have any devices yet, let me start off by checking the arguments of the add-device function:
 
@@ -26,13 +29,13 @@ Since I don't have any devices yet, let me start off by checking the arguments o
 
 .. code:: shell
 
-  python3 phpipam_pyclient.py - add-device -- --help
+  phpipam-pyclient - add-device -- --help
 
 - output:
 
 .. code:: shell
 
-  root@f6c8a8161a60:/app/phpipam_pyclient# python3 phpipam_pyclient.py - add-device -- --help
+  root@c0630eda943f:/app# phpipam-pyclient - add-device -- --help
   Type:        method
   String form: <bound method PHPIpamClient.add_device of <__main__.PHPIpamClient object at 0x7fd016505828>>
   File:        phpipam_pyclient.py
@@ -44,9 +47,8 @@ Since I don't have any devices yet, let me start off by checking the arguments o
   :device: dictionary that represents a device
   :Returns: REST post status code
 
-  Usage:       phpipam_pyclient.py - add-device [DEVICE]
-               phpipam_pyclient.py - add-device [--device DEVICE]
-  root@f6c8a8161a60:/app/phpipam_pyclient#
+  Usage:       phpipam-pyclient - add-device [DEVICE]
+               phpipam-pyclient - add-device [--device DEVICE]
 
 Let's add three devices on PHPIPam:
 
@@ -54,9 +56,9 @@ Let's add three devices on PHPIPam:
 
 .. code:: shell
 
-  python3 phpipam_pyclient.py add-device --device '{hostname:"server1",ip:"1.2.3.4",description:"backend"}'
-  python3 phpipam_pyclient.py add-device --device '{hostname:"server2",ip:"1.2.3.5",description:"backend"}'
-  python3 phpipam_pyclient.py add-device --device '{hostname:"server3",ip:"1.2.3.6",description:"frontend"}'
+  phpipam-pyclient add-device --device '{hostname:"server1",ip:"1.2.3.4",description:"backend"}'
+  phpipam-pyclient add-device --device '{hostname:"server2",ip:"1.2.3.5",description:"backend"}'
+  phpipam-pyclient add-device --device '{hostname:"server3",ip:"1.2.3.6",description:"frontend"}'
 
 - output
 
@@ -64,13 +66,13 @@ Note all REST calls returned 201 (OK) status code:
 
 .. code:: shell
 
-  root@f6c8a8161a60:/app/phpipam_pyclient#   python3 phpipam_pyclient.py add-device --device '{hostname:"server1",ip:"1.2.3.4",description:"backend"}'
+  root@c0630eda943f:/app/phpipam_pyclient#   phpipam-pyclient add-device --device '{hostname:"server1",ip:"1.2.3.4",description:"backend"}'
   201
-  root@f6c8a8161a60:/app/phpipam_pyclient#   python3 phpipam_pyclient.py add-device --device '{hostname:"server2",ip:"1.2.3.5",description:"backend"}'
+  root@c0630eda943f:/app/phpipam_pyclient#   phpipam-pyclient add-device --device '{hostname:"server2",ip:"1.2.3.5",description:"backend"}'
   201
-  root@f6c8a8161a60:/app/phpipam_pyclient#   python3 phpipam_pyclient.py add-device --device '{hostname:"server3",ip:"1.2.3.6",description:"frontend"}'
+  root@c0630eda943f:/app/phpipam_pyclient#   phpipam-pyclient add-device --device '{hostname:"server3",ip:"1.2.3.6",description:"frontend"}'
   201
-  root@f6c8a8161a60:/app/phpipam_pyclient#
+  root@c0630eda943f:/app/phpipam_pyclient#
 
 Now, let's list all devices on PHPIPam:
 
@@ -78,13 +80,13 @@ Now, let's list all devices on PHPIPam:
 
 .. code:: shell
 
-  python3 phpipam_pyclient.py list-devices
+  phpipam-pyclient list-devices
 
 - output:
 
 .. code:: shell
 
-  root@f6c8a8161a60:/app/phpipam_pyclient# python3 phpipam_pyclient.py list-devices
+  root@c0630eda943f:/app/phpipam_pyclient# phpipam-pyclient list-devices
   {"sections": "1;2", "snmp_v3_priv_protocol": "none", "snmp_queries": null, "hostname": "server1", "snmp_port": "161", "rack_size": null, "id": "1", "location": null, "snmp_v3_priv_pass": null, "description": "backend", "snmp_v3_auth_pass": null, "ip": "1.2.3.4", "editDate": null, "snmp_v3_ctx_name": null, "snmp_timeout": "500", "snmp_v3_auth_protocol": "none", "rack_start": null,"snmp_v3_ctx_engine_id": null, "rack": null, "type": "0", "snmp_version": "0", "snmp_community": null, "snmp_v3_sec_level": "none"}
   {"sections": "1;2", "snmp_v3_priv_protocol": "none", "snmp_queries": null, "hostname": "server2", "snmp_port": "161", "rack_size": null, "id": "2", "location": null, "snmp_v3_priv_pass": null, "description": "backend", "snmp_v3_auth_pass": null, "ip": "1.2.3.5", "editDate": null, "snmp_v3_ctx_name": null, "snmp_timeout": "500", "snmp_v3_auth_protocol": "none", "rack_start": null,"snmp_v3_ctx_engine_id": null, "rack": null, "type": "0", "snmp_version": "0", "snmp_community": null, "snmp_v3_sec_level": "none"}
   {"sections": "1;2", "snmp_v3_priv_protocol": "none", "snmp_queries": null, "hostname": "server3", "snmp_port": "161", "rack_size": null, "id": "3", "location": null, "snmp_v3_priv_pass": null, "description": "frontend", "snmp_v3_auth_pass": null, "ip": "1.2.3.6", "editDate": null, "snmp_v3_ctx_name": null, "snmp_timeout": "500", "snmp_v3_auth_protocol": "none", "rack_start": null,"snmp_v3_ctx_engine_id": null, "rack": null, "type": "0", "snmp_version": "0", "snmp_community": null, "snmp_v3_sec_level": "none"}
@@ -95,7 +97,7 @@ Sweet! What if I wanted to export these devices as an Ansible inventory? I can g
 
 .. code:: shell
 
-  python3 phpipam_pyclient.py ansible-inv-endpoint-field devices/ "description"
+  phpipam-pyclient ansible-inv-endpoint-field devices/ "description"
 
 .. note::
 
@@ -103,7 +105,7 @@ Sweet! What if I wanted to export these devices as an Ansible inventory? I can g
 
 .. code:: shell
 
-  root@f6c8a8161a60:/app/phpipam_pyclient# python3 phpipam_pyclient.py ansible-inv-endpoint-field devices/ "description"
+  root@c0630eda943f:/app/phpipam_pyclient# phpipam-pyclient ansible-inv-endpoint-field devices/ "description"
   [frontend]
   server3
 
@@ -118,17 +120,17 @@ From this point forward, Ansible all the way to do whatever you need. But, what 
 
 .. code:: shell
 
-  python3 phpipam_pyclient.py list-device-fields
+  phpipam-pyclient list-device-fields
 
 - output:
 
 .. code:: shell
 
-    root@f6c8a8161a60:/app/phpipam_pyclient# python3 phpipam_pyclient.py list-device-fields
+    root@c0630eda943f:/app/phpipam_pyclient# phpipam-pyclient list-device-fields
   Type:        dict_keys
   String form: dict_keys(['rack_size', 'snmp_v3_priv_pass', 'snmp_community', 'snmp_v3_priv_protocol', 'sections', 'snmp_v3_ctx_name', 'snmp_v3_sec_level', 'editDate', 'rack_start', 'hostname', 'snmp_version', 'snmp_queries', 'snmp_v3_auth_pass', 'snmp_timeout', 'id', 'rack', 'description', 'location', 'snmp_v3_ctx_engine_id', 'ip', 'snmp_v3_auth_protocol', 'type', 'snmp_port'])
   Length:      23
 
   Usage:       phpipam_pyclient.py list-device-fields
                phpipam_pyclient.py list-device-fields isdisjoint
-  root@f6c8a8161a60:/app/phpipam_pyclient#
+  root@c0630eda943f:/app/phpipam_pyclient#
