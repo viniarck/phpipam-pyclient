@@ -59,7 +59,8 @@ class TestPhpIpamInstallation(object):
 
     @pytest.fixture
     def find_element_dict_send_keys(self, function, payload):
-        """Generic function to find an element given a function and payload dict
+        """Generic function to find an element given a function and
+        payload dict
 
         :function: selenium find_element_by_*
         :payload: dictionary payload, field and values

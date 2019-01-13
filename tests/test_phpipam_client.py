@@ -44,8 +44,17 @@ class TestPhpIpamClient(object):
 
         """
         client = get_client
-        req = client._auth_session()
+        req = client.auth_session()
         assert req.status_code == 200
+
+    def test_version(self, get_client):
+        """Test authentication
+
+        """
+        client = get_client
+        req = client.auth_session()
+        assert req.status_code == 200
+        assert client.version()
 
     def test_add_device(self, get_client, devices_data):
         """Test add devices
