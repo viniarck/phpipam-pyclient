@@ -20,7 +20,7 @@ class PHPIpamClient(object):
     """PHPIPam Python API Client"""
 
     def __init__(self, cfg_file='config.json', open_con=True, load_conf=True):
-        """PPHIpam Python client
+        """PHPIpam Python client
         This class is meant to be used with Google's fire in order to also
         be used in a CLI exploring style.
 
