@@ -172,8 +172,12 @@ class TestPhpIpamInstallation(object):
                 '//*[@id="settings"]/tbody/tr[51]/td[2]/input').click()
         except NoSuchElementException:
             # new version has changed the layout slightly
-            drv.find_element_by_xpath(
-                '//*[@id="settings"]/tbody/tr[52]/td[2]/input').click()
+            try:
+                drv.find_element_by_xpath(
+                    '//*[@id="settings"]/tbody/tr[52]/td[2]/input').click()
+            except NoSuchElementException:
+                drv.find_element_by_xpath(
+                    '//*[@id="settings"]/tbody/tr[54]/td[2]/input').click()
 
         # force it to refresh.
         for _ in range(0, 2):
@@ -184,7 +188,10 @@ class TestPhpIpamInstallation(object):
         sel = Select(drv.find_element_by_name('app_permissions'))
         sel.select_by_visible_text('Read / Write / Admin')
         sel = Select(drv.find_element_by_name('app_security'))
-        sel.select_by_visible_text('none')
+        try:
+            sel.select_by_visible_text('none')
+        except NoSuchElementException:
+            sel.select_by_visible_text('User token')
         try:
             drv.find_element_by_xpath('//*[@id="apiEditSubmit"]').click()
         except NoSuchElementException:
