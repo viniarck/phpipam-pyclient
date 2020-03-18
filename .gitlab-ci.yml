@@ -21,7 +21,7 @@ lint_tests:
   stage: integration_tests
   before_script:
     - apk add --no-cache py-pip
-    - pip install docker-compose
+    - pip install docker-compose==1.23.2
   after_script:
     - docker ps
     - sleep 10

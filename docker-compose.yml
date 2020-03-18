@@ -10,7 +10,10 @@ services:
   ipam:
     depends_on:
       - mysql
-    image: pierrecdn/phpipam:1.3.2
+    image: pierrecdn/local_phpipam:1.4
+    build:
+      context: .
+      dockerfile: ./Dockerfile.phpipam
     environment:
       - MYSQL_ENV_MYSQL_ROOT_PASSWORD=my-secret-pw
       - MYSQL_ENV_MYSQL_PASSWORD=my-secret-pw

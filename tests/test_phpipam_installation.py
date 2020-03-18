@@ -144,6 +144,24 @@ class TestPhpIpamInstallation(object):
         # success message.
         drv.find_element_by_partial_link_text('Proceed').click()
 
+    def add_api_id(self, drv, app_name) -> None:
+        """Finish up by adding the api id and confirming."""
+
+        drv.find_element_by_name('app_id').send_keys(app_name)
+        sel = Select(drv.find_element_by_name('app_permissions'))
+        sel.select_by_visible_text('Read / Write / Admin')
+        sel = Select(drv.find_element_by_name('app_security'))
+        try:
+            sel.select_by_visible_text('none')
+        except NoSuchElementException:
+            sel.select_by_visible_text('User token')
+        try:
+            drv.find_element_by_xpath('//*[@id="apiEditSubmit"]').click()
+        except NoSuchElementException:
+            # new version has changed the layout slightly
+            drv.find_element_by_xpath(
+                '//*[@id="popup"]/div[3]/div[1]/button[2]').click()
+
     def test_enable_api(self, get_args):
         """Test login and enable the API
 
@@ -172,22 +190,15 @@ class TestPhpIpamInstallation(object):
                 '//*[@id="settings"]/tbody/tr[51]/td[2]/input').click()
         except NoSuchElementException:
             # new version has changed the layout slightly
-            drv.find_element_by_xpath(
-                '//*[@id="settings"]/tbody/tr[52]/td[2]/input').click()
+            try:
+                drv.find_element_by_xpath(
+                    '//*[@id="settings"]/tbody/tr[52]/td[2]/input').click()
+            except NoSuchElementException:
+                drv.find_element_by_xpath(
+                    '//*[@id="settings"]/tbody/tr[54]/td[2]/input').click()
 
         # force it to refresh.
         for _ in range(0, 2):
             drv.get(get_args['settings_api_url'])
         drv.find_element_by_xpath('//*[@id="content"]/button').click()
-
-        drv.find_element_by_name('app_id').send_keys(get_args['app_name'])
-        sel = Select(drv.find_element_by_name('app_permissions'))
-        sel.select_by_visible_text('Read / Write / Admin')
-        sel = Select(drv.find_element_by_name('app_security'))
-        sel.select_by_visible_text('none')
-        try:
-            drv.find_element_by_xpath('//*[@id="apiEditSubmit"]').click()
-        except NoSuchElementException:
-            # new version has changed the layout slightly
-            drv.find_element_by_xpath(
-                '//*[@id="popup"]/div[3]/div[1]/button[2]').click()
+        self.add_api_id(drv, get_args['app_name'])
