@@ -11,6 +11,7 @@ import requests
 import os
 import sys
 from phpipam_pyclient.version import __version__
+
 DISABLE_SSL_WARNINGS = True
 if DISABLE_SSL_WARNINGS:
     warnings.filterwarnings("ignore")
@@ -19,22 +20,17 @@ if DISABLE_SSL_WARNINGS:
 class PHPIpamClient(object):
     """PHPIPam Python API Client"""
 
-    def __init__(self, cfg_file='config.json', open_con=True, load_conf=True):
+    def __init__(self, cfg_file="config.json", init_auth=True):
         """PHPIpam Python client
         This class is meant to be used with Google's fire in order to also
         be used in a CLI exploring style.
-
-        :cfg_file: json configuration file
-        :open_con: True to open TCP connection
-        :open_con: True to auto load config
-
         """
         try:
             self.load_config(cfg_file=cfg_file)
             self._token = None
             self._session = None
             self._verify = False
-            if open_con:
+            if init_auth:
                 self.auth_session()
         except FileNotFoundError as e:
             print(str(e))
@@ -46,7 +42,7 @@ class PHPIpamClient(object):
             print("\nHave you configured your config.json file yet? ")
             sys.exit(1)
 
-    def load_config(self, cfg_file='config.json'):
+    def load_config(self, cfg_file="config.json"):
         """Load configuration file specified in config.json
 
         If the PHPIPAM_PYCLIENT_CFG_FILE environment variable
@@ -57,55 +53,53 @@ class PHPIpamClient(object):
         """
         file_path = os.environ.get("PHPIPAM_PYCLIENT_CFG_FILE")
         if not file_path:
-            file_path = os.path.join(os.path.abspath(
-                                     os.path.dirname(__file__)),
-                                     cfg_file)
+            file_path = os.path.join(
+                os.path.abspath(os.path.dirname(__file__)), cfg_file
+            )
         with open(file_path) as json_file:
             data = json.load(json_file)
-            self._base_url = data['base_url']
-            self._api_name = data['api_name']
-            self._auth_url = "{0}/{1}/user/".format(self._base_url,
-                                                    self._api_name)
+            self._base_url = data["base_url"]
+            self._api_name = data["api_name"]
+            self._auth_url = "{0}/{1}/user/".format(self._base_url, self._api_name)
             self._api_url = "{0}/{1}".format(self._base_url, self._api_name)
-            self._user = data['user']
-            self._passwd = data['passwd']
+            self._user = data["user"]
+            self._passwd = data["passwd"]
+
+    def _build_url(self, endpoint: str):
+        """Build url"""
+        return f"{self._api_url}/{endpoint}"
 
     def auth_session(self):
-        """Authenticate on PHPIpam API
-
-        """
-        req = requests.post(self._auth_url, auth=(self._user, self._passwd),
-                            verify=self._verify)
+        """Authenticate on PHPIpam API"""
+        req = requests.post(
+            self._auth_url, auth=(self._user, self._passwd), verify=self._verify
+        )
         if req.status_code != 200:
             raise requests.exceptions.RequestException(
-                "Authentication failed on {0}".format(self._auth_url))
-        self._token = {"token": req.json()['data']['token']}
+                "Authentication failed on {0}".format(self._auth_url)
+            )
+        self._token = {"token": req.json()["data"]["token"]}
         return req
 
     def _call(self, endpoint):
-        """Generic requests an endpoint based on API url's
-
-        """
+        """Generic requests an endpoint based on API url's"""
         url = "{0}/{1}".format(self._api_url, endpoint)
         return requests.get(url, headers=self._token, verify=self._verify)
 
     def _post(self, endpoint, data):
-        """Generic posts to an endpoint based on API url's
-
-        """
+        """Generic posts to an endpoint based on API url's"""
         url = "{0}/{1}".format(self._api_url, endpoint)
-        return requests.post(
-            url, headers=self._token, verify=self._verify, data=data)
+        return requests.post(url, headers=self._token, verify=self._verify, data=data)
 
     def list_device_fields(self):
-        """List all devices' available fields/columns
-
-        """
-        req = self._call(endpoint='devices/')
-        if req.status_code == 200:
-            data = req.json()['data']
-            for device in data:
-                return device.keys()
+        """List all devices' available fields/columns"""
+        req = requests.get(
+            self._build_url("devices/"), headers=self._token, verify=self._verify
+        )
+        req.raise_for_status()
+        data = req.json()["data"]
+        for device in data:
+            return device.keys()
         return []
 
     def ansible_inv_endpoint_field(self, endpoint, field):
@@ -118,32 +112,33 @@ class PHPIpamClient(object):
         :Returns: str formated as Ansible inventory
 
         """
-        req = self._call(endpoint=endpoint)
-        if req.status_code == 200:
-            data = req.json().get('data')
-            if data:
-                dev = {}
-                for device in data:
-                    if device.get(field):
-                        if dev.get(device.get(field)):
-                            dev[device.get(field)].append(
-                                device.get('hostname'))
-                        else:
-                            dev[device.get(field)] = [(device.get('hostname'))]
-                res = str()
-                for key, value in dev.items():
-                    res = res + "[{0}]\n".format(key)
-                    for host in value:
-                        res = res + "{0}\n".format(host)
-                    res = res + "\n"
-                return res
-        return None
+        req = requests.get(
+            self._build_url(endpoint), headers=self._token, verify=self._verify
+        )
+        req.raise_for_status()
+        data = req.json().get("data")
+        if not data:
+            return None
+
+        # TODO continue here...
+        dev = {}
+        for device in data:
+            if device.get(field):
+                if dev.get(device.get(field)):
+                    dev[device.get(field)].append(device.get("hostname"))
+                else:
+                    dev[device.get(field)] = [(device.get("hostname"))]
+        res = str()
+        for key, value in dev.items():
+            res = res + "[{0}]\n".format(key)
+            for host in value:
+                res = res + "{0}\n".format(host)
+            res = res + "\n"
+        return res
 
     def _delete_device(self, id):
-        """Delete a device given a database id
-
-        """
-        url = "{0}/{1}".format(self._api_url, 'devices/{0}/'.format(id))
+        """Delete a device given a database id"""
+        url = "{0}/{1}".format(self._api_url, "devices/{0}/".format(id))
         return requests.delete(url, headers=self._token, verify=self._verify)
 
     def add_device(self, device=None):
@@ -155,38 +150,91 @@ class PHPIpamClient(object):
         :Returns: REST post status code
 
         """
-        # in order to pass a dict via CLI
         if isinstance(device, str):
             device = json.loads(device)
-        return self._post(endpoint='devices/1/', data=device).status_code
+        url = f"{self._api_url}/devices/1/"
+        return requests.post(
+            url, headers=self._token, verify=self._verify, data=device
+        ).status_code
 
-    def list_devices(self, fields=None):
+    def _apply_filter(self, filter_obj, collection):
+        """Apply a filter to a collection"""
+        if not collection:
+            return collection
+
+        if not isinstance(filter_obj, dict):
+            raise ValueError(f"filter {filter_obj} must be a dictionary")
+        if any(
+            (
+                "type" not in filter_obj,
+                "field" not in filter_obj,
+                "value" not in filter_obj,
+            )
+        ):
+            raise ValueError(
+                f"filter must have 'type', 'field' and 'value' keys. obj: {filter_obj}"
+            )
+
+        filter_value = filter_obj["value"]
+        filter_field = filter_obj["field"]
+        filter_types = {
+            "contains": lambda x: filter_value in x.get(filter_field),
+            "eq": lambda x: filter_value == x.get(filter_field),
+            "ge": lambda x: float(filter_value) <= float(x.get(filter_field)),
+            "gt": lambda x: float(filter_value) < float(x.get(filter_field)),
+            "le": lambda x: float(filter_value) >= float(x.get(filter_field)),
+            "lt": lambda x: float(filter_value) > float(x.get(filter_field)),
+        }
+        if filter_obj["type"] not in filter_types:
+            raise ValueError(
+                f"invalid filter type, it must be of one these values: {list(filter_types.keys())}"
+            )
+
+        return list(
+            filter(
+                filter_types[filter_obj["type"]],
+                [elem for elem in collection if filter_obj["field"] in elem],
+            )
+        )
+
+    def list_devices(self, fields=None, filters=[]):
         """List all devices and filter for specific fields
 
-        :fields: optional field attributes to be filtered
+        :fields: optional field attributes to be included, includes all by default
+        :filters: filter objects to filter each field with an expression and value
 
         Example:
-        - fields=["ip", "hostname"]
+        - fields=["ip", "hostname", "vendor"]
+        - filters=[{"type": "contains", "field": "hostname", "value": "light"}]
 
         """
         if not isinstance(fields, list):
             fields = []
-        req = self._call(endpoint='devices/')
-        if req.status_code == 200:
-            device_list = []
-            data = req.json().get('data')
-            # it can be None type.
-            if data:
-                for device in data:
-                    if fields:
-                        dev = {}
-                        for field in fields:
-                            dev[field] = device.get(field)
-                        if dev:
-                            device_list.append(dev)
-                    else:
-                        device_list.append(device)
-            return device_list
+
+        req = requests.get(
+            self._build_url("devices/"), headers=self._token, verify=self._verify
+        )
+        req.raise_for_status()
+
+        data = req.json().get("data")
+        if not data:
+            return []
+
+        device_list = []
+        for device in data:
+            if not fields:
+                device_list.append(device)
+                continue
+
+            dev = {}
+            for field in fields:
+                dev[field] = device.get(field)
+            if dev:
+                device_list.append(dev)
+
+        for filter_obj in filters:
+            device_list = self._apply_filter(filter_obj, device_list)
+        return device_list
 
     def version(self):
         """Get phpipam-pyclient version."""

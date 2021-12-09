@@ -27,6 +27,8 @@ class TestPhpIpamClient(object):
                 "hostname": "dev1",
                 "ip": "1.2.3.4",
                 "description": "Ubuntu",
+                "device_type": "server",
+                "rack_size": 1,
                 "id": 1,
             }
         )
@@ -35,6 +37,8 @@ class TestPhpIpamClient(object):
                 "hostname": "dev2",
                 "ip": "4.3.2.1",
                 "description": "Ubuntu",
+                "device_type": "server",
+                "rack_size": 2,
                 "id": 2,
             }
         )
@@ -43,6 +47,7 @@ class TestPhpIpamClient(object):
                 "hostname": "dev3",
                 "ip": "1.2.3.4",
                 "description": "CentOS",
+                "device_type": "server",
                 "id": 3,
             }
         )
@@ -96,19 +101,115 @@ class TestPhpIpamClient(object):
         assert len(resp) >= len(devices_data)
 
     @responses.activate
-    def test_list_devices_filter(self, get_client, devices_data):
-        """Test get all devices with filtering"""
+    def test_list_devices_fields(self, get_client, devices_data):
+        """Test get all devices with fields selection"""
         responses.add(
             responses.GET,
             "http://localhost/api/testing/devices/",
             json={"data": devices_data},
         )
 
-        filter = "hostname"
         client = get_client
-        resp = client.list_devices(fields=[filter])
-        for dev in devices_data:
-            assert {filter: dev[filter]} in resp
+        fields = ["hostname"]
+        resp = client.list_devices(fields=fields)
+        for dev in resp:
+            assert list(dev.keys()) == fields
+
+    @responses.activate
+    def test_list_devices_filter_eq_contains(self, get_client, devices_data):
+        """Test get all devices filter eq and contains"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "contains", "field": "description", "value": "Ubu"},
+            {"type": "eq", "field": "device_type", "value": "server"},
+        ]
+        resp = client.list_devices(filters=filters)
+        for dev in resp:
+            assert "Ubu" in dev["description"] and dev["device_type"] == "server"
+
+        filters = [
+            {"type": "contains", "field": "description", "value": "not_found"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert not resp
+
+    @responses.activate
+    def test_list_devices_filter_le(self, get_client, devices_data):
+        """Test get all devices filter le"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "le", "field": "rack_size", "value": "3"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert resp
+        for dev in resp:
+            assert dev["rack_size"] <= 3
+
+    @responses.activate
+    def test_list_devices_filter_lt(self, get_client, devices_data):
+        """Test get all devices filter numeric"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "lt", "field": "rack_size", "value": "2"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert resp
+        for dev in resp:
+            assert dev["rack_size"] < 2
+
+    @responses.activate
+    def test_list_devices_filter_gt(self, get_client, devices_data):
+        """Test get all devices filter gt"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "gt", "field": "rack_size", "value": "1"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert resp
+        for dev in resp:
+            assert dev["rack_size"] > 1
+
+    @responses.activate
+    def test_list_devices_filter_ge(self, get_client, devices_data):
+        """Test get all devices filter ge"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "ge", "field": "rack_size", "value": "1"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert resp
+        for dev in resp:
+            assert dev["rack_size"] >= 1
 
     @responses.activate
     def test_list_device_fields(self, get_client, devices_data):
