@@ -10,6 +10,7 @@ import warnings
 import requests
 import os
 import sys
+from collections import defaultdict
 from phpipam_pyclient.version import __version__
 
 DISABLE_SSL_WARNINGS = True
@@ -81,16 +82,6 @@ class PHPIpamClient(object):
         self._token = {"token": req.json()["data"]["token"]}
         return req
 
-    def _call(self, endpoint):
-        """Generic requests an endpoint based on API url's"""
-        url = "{0}/{1}".format(self._api_url, endpoint)
-        return requests.get(url, headers=self._token, verify=self._verify)
-
-    def _post(self, endpoint, data):
-        """Generic posts to an endpoint based on API url's"""
-        url = "{0}/{1}".format(self._api_url, endpoint)
-        return requests.post(url, headers=self._token, verify=self._verify, data=data)
-
     def list_device_fields(self):
         """List all devices' available fields/columns"""
         req = requests.get(
@@ -102,15 +93,35 @@ class PHPIpamClient(object):
             return device.keys()
         return []
 
-    def ansible_inv_endpoint_field(self, endpoint, field):
+    def _validate_ansible_kwargs(dict_value):
+        if not isinstance(dict_value, dict):
+            raise ValueError(
+                f"ansible_kwargs is supposed to be a dict. got {dict_value}"
+            )
+        for key in dict_value.keys():
+            if not isinstance(dict_value[key], dict):
+                raise ValueError(f"ansible_kwargs key '{key}' is supposed to be a dict")
+        return dict_value
+
+    def ansible_inv_endpoint_field(
+        self, endpoint, group_field, include_groups=[], filters=[], ansible_kwargs={}
+    ):
         """Group devices based on a unique field value and outputs
         Ansible inventory
 
         :endpoint: endpoint to be filtered, e.g., devices/
-        :field: field to be filtered as a group, e.g., "description",
-        "server_os" (custom), etc..
+        :group_field: field to be filtered as a group, e.g., "description",
+        :include_groups: ansible groups to be included, if empty, includes all
+        :filters: filter objects to filter each host field with an expression and value
+        :ansible_kwargs: ansible kwargs to be set based on a group name as default values
         :Returns: str formated as Ansible inventory
 
+        Example:
+        - endpoint=devices/
+        - group_field=description
+        - include_groups=["backend"]
+        - filters=[{"type": "contains", "field": "hostname", "value": "light"}]
+        - ansible_kwargs={"backend": {"ansible_port": "2222"}}
         """
         req = requests.get(
             self._build_url(endpoint), headers=self._token, verify=self._verify
@@ -120,19 +131,27 @@ class PHPIpamClient(object):
         if not data:
             return None
 
-        # TODO continue here...
-        dev = {}
-        for device in data:
-            if device.get(field):
-                if dev.get(device.get(field)):
-                    dev[device.get(field)].append(device.get("hostname"))
-                else:
-                    dev[device.get(field)] = [(device.get("hostname"))]
+        device_list = data
+        for filter_obj in filters:
+            device_list = self._apply_filter(filter_obj, device_list)
+
+        dev = defaultdict(list)
+        for device in device_list:
+            if not device.get(group_field):
+                continue
+            if include_groups and device.get(group_field) not in include_groups:
+                continue
+            dev[device.get(group_field)].append(device.get("hostname"))
+
         res = str()
         for key, value in dev.items():
             res = res + "[{0}]\n".format(key)
             for host in value:
-                res = res + "{0}\n".format(host)
+                if key not in ansible_kwargs:
+                    res = res + "{0}\n".format(host)
+                else:
+                    args = [f"{k}={v}" for k, v in ansible_kwargs[key].items()]
+                    res = res + "{0} {1}\n".format(host, " ".join(args))
             res = res + "\n"
         return res
 
