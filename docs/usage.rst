@@ -136,7 +136,7 @@ From this point forward, Ansible all the way to do whatever you need. But, what 
   root@c0630eda943f:/app/phpipam_pyclient#
 
 
-On version 1.0.0, released in Dec 2021, new filtering and Ansible grouping capabilities were added, so now you can:
+On version 1.0.0, released in Dec 2021, new filtering and Ansible grouping capabilities have been added:
 
 Use and combine multiple filters to filter based on any field that they have, for instance, let's say you wanted to filter if 'ip' fields contains the string '1.2.3' and also the 'description' is equal to 'backend'. These filter options are also available in the ``ansible_inv_endpoint_field`` command, here's it's being used on the ``list_devices`` command:
 
@@ -148,11 +148,7 @@ Use and combine multiple filters to filter based on any field that they have, fo
     {"hostname": "server2", "ip": "1.2.3.5", "description": "backend"}
 
 
-If you need numerical comparisons, you can use the filter type as ``ge, gt, le, gt`` which respectively means greater than or equal, greater than, less than or equal, greater than.
-
-
-Another feature that was added was the support for adding Ansible default variables when generating the inventory, for instance, let's say you want to use these filters, group them by their ``description``, but also, for any hosts that have the ``description`` as ``frontend`` you want to set the ``ansible_port`` as 2222, and ``ansible_user`` as ``some_user``:
-
+If you need numerical comparisons, you can use the filter type as ``ge, gt, le, gt`` which respectively means greater than or equal, greater than, less than or equal, greater than.  Another feature that was added was the support for adding Ansible default variables when generating the inventory, for instance, let's say you want to use these filters, group them by their ``description``, but also, for any hosts that have the ``description`` as ``frontend`` you want to set the ``ansible_port`` as 2222, and ``ansible_user`` as ``some_user``:
 
 .. code:: shell
 
@@ -166,7 +162,7 @@ Another feature that was added was the support for adding Ansible default variab
     server3 ansible_port=2222 ansible_user=some_user
 
 
-On top of that if you also only want to include certain Ansible groups you can leverage the ``--include_groups`` option, notice that compared to the previous example, only the ``frontend`` group, that was grouped by their description is in the generated output:
+On top of that, if you also only want to include certain Ansible groups you can leverage the ``--include_groups`` option, notice that compared to the previous example, only the ``frontend`` group, that was grouped by their description is in the generated output:
 
 
 .. code:: shell
