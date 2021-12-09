@@ -136,6 +136,9 @@ From this point forward, Ansible all the way to do whatever you need. But, what 
   root@c0630eda943f:/app/phpipam_pyclient#
 
 
+New Features
+------------
+
 On version 1.0.0, released in Dec 2021, new filtering and Ansible grouping capabilities have been added:
 
 Use and combine multiple filters (as a logic ``and`` operator) to filter based on any field that they have, for instance, let's say you wanted to filter if 'ip' fields contains the string '1.2.3' and also the 'description' is equal to 'backend'. These filter options are also available in the ``ansible_inv_endpoint_field`` command, here's it's being used on the ``list_devices`` command:
