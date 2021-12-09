@@ -1,0 +1,6 @@
+{
+  "base_url":"http://localhost/api",
+  "api_name":"testing",
+  "user":"admin",
+  "passwd":"my-secret-pw"
+}
