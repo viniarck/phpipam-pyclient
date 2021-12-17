@@ -194,15 +194,21 @@ class PHPIpamClient(object):
                 f"filter must have 'type', 'field' and 'value' keys. obj: {filter_obj}"
             )
 
+        def float_cast(value) -> float:
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                return 0
+
         filter_value = filter_obj["value"]
         filter_field = filter_obj["field"]
         filter_types = {
             "contains": lambda x: filter_value in str(x.get(filter_field)),
             "eq": lambda x: filter_value == str(x.get(filter_field)),
-            "ge": lambda x: float(filter_value) <= float(x.get(filter_field)),
-            "gt": lambda x: float(filter_value) < float(x.get(filter_field)),
-            "le": lambda x: float(filter_value) >= float(x.get(filter_field)),
-            "lt": lambda x: float(filter_value) > float(x.get(filter_field)),
+            "ge": lambda x: float(filter_value) <= float_cast(x.get(filter_field)),
+            "gt": lambda x: float(filter_value) < float_cast(x.get(filter_field)),
+            "le": lambda x: float(filter_value) >= float_cast(x.get(filter_field)),
+            "lt": lambda x: float(filter_value) > float_cast(x.get(filter_field)),
         }
         if filter_obj["type"] not in filter_types:
             raise ValueError(

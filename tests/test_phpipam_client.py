@@ -29,6 +29,7 @@ class TestPhpIpamClient(object):
                 "description": "Ubuntu",
                 "device_type": "server",
                 "rack_size": 1,
+                "rack_power": "a",
                 "id": 1,
             }
         )
@@ -39,6 +40,7 @@ class TestPhpIpamClient(object):
                 "description": "Ubuntu",
                 "device_type": "server",
                 "rack_size": 2,
+                "rack_power": 10,
                 "id": 2,
             }
         )
@@ -255,3 +257,22 @@ class TestPhpIpamClient(object):
                 if dev["hostname"] == ddata["hostname"]:
                     req = get_client._delete_device(dev["id"])
                     assert req.status_code == 200
+
+    @responses.activate
+    def test_list_devices_filter_ge_float_cast(self, get_client, devices_data):
+        """Test get all devices filter ge with float cast"""
+        responses.add(
+            responses.GET,
+            "http://localhost/api/testing/devices/",
+            json={"data": devices_data},
+        )
+
+        client = get_client
+        filters = [
+            {"type": "ge", "field": "rack_power", "value": "1"},
+        ]
+        resp = client.list_devices(filters=filters)
+        assert resp
+        for dev in resp:
+            if "rack_size" in dev:
+                assert dev["rack_size"] >= 1
