@@ -46,7 +46,7 @@ class TestPhpIpamClient(object):
             {
                 "hostname": "dev3",
                 "ip": "1.2.3.4",
-                "description": "CentOS",
+                "description": None,
                 "device_type": "server",
                 "id": 3,
             }

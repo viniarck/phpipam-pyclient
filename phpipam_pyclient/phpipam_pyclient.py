@@ -197,8 +197,8 @@ class PHPIpamClient(object):
         filter_value = filter_obj["value"]
         filter_field = filter_obj["field"]
         filter_types = {
-            "contains": lambda x: filter_value in x.get(filter_field),
-            "eq": lambda x: filter_value == x.get(filter_field),
+            "contains": lambda x: filter_value in str(x.get(filter_field)),
+            "eq": lambda x: filter_value == str(x.get(filter_field)),
             "ge": lambda x: float(filter_value) <= float(x.get(filter_field)),
             "gt": lambda x: float(filter_value) < float(x.get(filter_field)),
             "le": lambda x: float(filter_value) >= float(x.get(filter_field)),
