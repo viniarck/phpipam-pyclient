@@ -93,7 +93,7 @@ class PHPIpamClient(object):
             return device.keys()
         return []
 
-    def _validate_ansible_kwargs(dict_value):
+    def _validate_ansible_kwargs(self, dict_value):
         if not isinstance(dict_value, dict):
             raise ValueError(
                 f"ansible_kwargs is supposed to be a dict. got {dict_value}"
@@ -123,6 +123,12 @@ class PHPIpamClient(object):
         - filters=[{"type": "contains", "field": "hostname", "value": "light"}]
         - ansible_kwargs={"backend": {"ansible_port": "2222"}}
         """
+        try:
+            self._validate_ansible_kwargs(ansible_kwargs)
+        except ValueError as e:
+            print(str(e))
+            sys.exit(1)
+
         req = requests.get(
             self._build_url(endpoint), headers=self._token, verify=self._verify
         )
@@ -133,7 +139,11 @@ class PHPIpamClient(object):
 
         device_list = data
         for filter_obj in filters:
-            device_list = self._apply_filter(filter_obj, device_list)
+            try:
+                device_list = self._apply_filter(filter_obj, device_list)
+            except ValueError as e:
+                print(str(e))
+                sys.exit(1)
 
         dev = defaultdict(list)
         for device in device_list:
@@ -257,9 +267,13 @@ class PHPIpamClient(object):
             if dev:
                 device_list.append(dev)
 
-        for filter_obj in filters:
-            device_list = self._apply_filter(filter_obj, device_list)
-        return device_list
+        try:
+            for filter_obj in filters:
+                device_list = self._apply_filter(filter_obj, device_list)
+            return device_list
+        except ValueError as e:
+            print(str(e))
+            sys.exit(1)
 
     def version(self):
         """Get phpipam-pyclient version."""
