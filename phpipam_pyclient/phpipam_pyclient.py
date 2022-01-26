@@ -90,7 +90,7 @@ class PHPIpamClient(object):
         req.raise_for_status()
         data = req.json()["data"]
         for device in data:
-            return device.keys()
+            return list(device.keys())
         return []
 
     def _validate_ansible_kwargs(self, dict_value):
