@@ -1,8 +1,6 @@
 Installation
 ============
 
-You have two options, either via the source code on Github or Docker:
-
 via Github
 ----------
 
@@ -28,22 +26,3 @@ via Github
   virtualenv -p python3.6 .venv
   source .venv/bin/activate
   pip install -e .
-
-via Docker
-----------
-
-::
-
-  docker run -i -t -d --name phpipam-pyclient registry.gitlab.com/viniarck/phpipam-pyclient:dev
-
-Edit your config.json file, either mount or copy to the container:
-
-::
-
-  docker cp <config.json> phpipam-pyclient:/app/phpipam_pyclient/
-
-Run the application:
-
-::
-
-  docker exec -i -t phpipam-pyclient /bin/bash -c 'phpipam-pyclient'

@@ -91,7 +91,7 @@ Now, let's list all devices on PHPIPam:
   {"sections": "1;2", "snmp_v3_priv_protocol": "none", "snmp_queries": null, "hostname": "server2", "snmp_port": "161", "rack_size": null, "id": "2", "location": null, "snmp_v3_priv_pass": null, "description": "backend", "snmp_v3_auth_pass": null, "ip": "1.2.3.5", "editDate": null, "snmp_v3_ctx_name": null, "snmp_timeout": "500", "snmp_v3_auth_protocol": "none", "rack_start": null,"snmp_v3_ctx_engine_id": null, "rack": null, "type": "0", "snmp_version": "0", "snmp_community": null, "snmp_v3_sec_level": "none"}
   {"sections": "1;2", "snmp_v3_priv_protocol": "none", "snmp_queries": null, "hostname": "server3", "snmp_port": "161", "rack_size": null, "id": "3", "location": null, "snmp_v3_priv_pass": null, "description": "frontend", "snmp_v3_auth_pass": null, "ip": "1.2.3.6", "editDate": null, "snmp_v3_ctx_name": null, "snmp_timeout": "500", "snmp_v3_auth_protocol": "none", "rack_start": null,"snmp_v3_ctx_engine_id": null, "rack": null, "type": "0", "snmp_version": "0", "snmp_community": null, "snmp_v3_sec_level": "none"}
 
-Sweet! What if I wanted to export these devices as an Ansible inventory? I can group Ansible servers by their description, for example:
+Sweet! What if I wanted to export these devices as an Ansible inventory? It can group Ansible servers by their description, for example:
 
 - input:
 
@@ -134,3 +134,43 @@ From this point forward, Ansible all the way to do whatever you need. But, what 
   Usage:       phpipam_pyclient.py list-device-fields
                phpipam_pyclient.py list-device-fields isdisjoint
   root@c0630eda943f:/app/phpipam_pyclient#
+
+
+New Features
+------------
+
+On version 1.0.0, released in Dec 2021, new filtering and Ansible grouping capabilities have been added:
+
+Use and combine multiple filters (as a logic ``and`` operator) to filter based on any field that they have, for instance, let's say you wanted to filter if 'ip' fields contains the string '1.2.3' and also the 'description' is equal to 'backend'. These filter options are also available in the ``ansible_inv_endpoint_field`` command, here's it's being used on the ``list_devices`` command:
+
+.. code:: shell
+
+    phpipam-pyclient list_devices --fields="['hostname', 'ip', 'description']" --filters="[{'type': 'contains', 'value': '1.2.3', 'field': 'ip'},{'type': 'eq', 'field': 'description', 'value': 'backend'}]"
+
+    {"hostname": "server1", "ip": "1.2.3.4", "description": "backend"}
+    {"hostname": "server2", "ip": "1.2.3.5", "description": "backend"}
+
+
+If you need numerical comparisons, you can use the filter type as ``ge, gt, le, gt`` which respectively means greater than or equal, greater than, less than or equal, greater than.  Another feature that was added was the support for adding Ansible default variables when generating the inventory, for instance, let's say you want to use these filters, group them by their ``description``, but also, for any hosts that have the ``description`` as ``frontend`` you want to set the ``ansible_port`` as 2222, and ``ansible_user`` as ``some_user``:
+
+.. code:: shell
+
+    phpipam-pyclient ansible_inv_endpoint_field devices/ description --filters="[{'type': 'contains', 'value': '1', 'field': 'ip'}]" --ansible_kwargs="{'frontend': {'ansible_port': 2222, ' ansible_user': 'some_user'}}"
+
+    [backend]
+    server1
+    server2
+
+    [frontend]
+    server3 ansible_port=2222 ansible_user=some_user
+
+
+On top of that, if you also only want to include certain Ansible groups you can leverage the ``--include_groups`` option, notice that compared to the previous example, only the ``frontend`` group, that was grouped by their description is in the generated output:
+
+
+.. code:: shell
+
+    phpipam-pyclient ansible_inv_endpoint_field devices/ description --filters="[{'type': 'contains', 'value': '1', 'field': 'ip'}]" --ansible_kwargs="{'frontend': {'ansible_port': 2222, 'ansible_user': 'some_user'}}" --include_groups="['frontend']"
+
+    [frontend]
+    server3 ansible_port=2222 ansible_user=some_user
